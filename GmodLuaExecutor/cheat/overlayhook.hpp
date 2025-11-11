@@ -9,6 +9,8 @@
 #include "../immods/imfilebrowser.hpp"
 #include "../immods/TextEditor.h"
 
+#include "../cheat/nethooks.hpp"
+
 #include "../globals.hpp"
 
 #include <d3d9.h>
@@ -79,6 +81,7 @@ namespace OverlayHook
 					auto script = editor.GetText();
 					executor.scriptQueue.push(script);
 					logs->println("Queued script from editor.");
+					Notifications::AddNotification("Queued script from editor.");
 				}
 
 				editor.Render("TextEditor");
@@ -86,8 +89,96 @@ namespace OverlayHook
 				ImGui::EndTabItem();
 			}
 
+			if (ImGui::BeginTabItem("Net Logger"))
+			{
+				ImGui::Checkbox("Enable net logger", &netHooksEnabled);
+				ImGui::Text("This will log all net messages to the logs.");
+				ImGui::Text("You can view the logs in the efs.log file.");
+				ImGui::EndTabItem();
+			}
+
 			ImGui::EndTabBar();
 			ImGui::End();
+
+			if (netHooksEnabled)
+			{
+				ImGui::SetNextWindowSize(ImVec2(438, 400));
+				ImGui::Begin("Net Transactions");
+				ImGui::Text("Created by I SUCK AT LIFE");
+
+				ImGui::BeginListBox("Net Transactions");
+
+				auto transactions = NetHooks::netTransactions;
+				static auto transactionIndex = -1;
+				for (int i = 0; i < transactions.size(); i++)
+					if (ImGui::Selectable((transactions[i]->messageName + "##" + std::to_string(i)).c_str(), false, ImGuiSelectableFlags_AllowDoubleClick))
+						transactionIndex = i;
+
+				ImGui::EndListBox();
+
+				if (ImGui::Button("Clear"))
+				{
+					NetHooks::netTransactions.clear();
+					logs->println("Cleared net transactions");
+					Notifications::AddNotification("Cleared net transactions");
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Save Filter"))
+				{
+					std::ofstream file("filter.txt");
+					if (file.is_open())
+					{
+						for (const auto& msg : NetHooks::skipNetMessages)
+							file << msg << std::endl;
+						file.close();
+						logs->println("Saved filter to filter.txt");
+						Notifications::AddNotification("Saved filter to filter.txt");
+					}
+					else
+					{
+						logs->println("Failed to open filter.txt for writing");
+						Notifications::AddNotification("Failed to save filter.txt");
+					}
+				}
+
+				ImGui::End();
+
+				if (transactionIndex >= 0 && transactionIndex < NetHooks::netTransactions.size())
+				{
+					ImGui::SetNextWindowSize(ImVec2(438, 400));
+					ImGui::Begin("Transaction Info");
+					ImGui::Text("Created by I SUCK AT LIFE");
+
+					ImGui::Text("Message Name: %s", NetHooks::netTransactions[transactionIndex]->messageName.c_str());
+					ImGui::Text("Finished: %s", NetHooks::netTransactions[transactionIndex]->finished ? "Yes" : "No");
+
+					if (ImGui::Button("Filter out"))
+					{
+						auto& skipMessages = NetHooks::skipNetMessages;
+						auto& messageName = NetHooks::netTransactions[transactionIndex]->messageName;
+						if (std::find(skipMessages.begin(), skipMessages.end(), messageName) == skipMessages.end())
+						{
+							skipMessages.push_back(messageName);
+							logs->println("Added %s to skip list", messageName.c_str());
+							Notifications::AddNotification("Added message to skip list");
+						}
+						else
+						{
+							logs->println("%s is already in the skip list", messageName.c_str());
+							Notifications::AddNotification("Message is already in the skip list");
+						}
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Close"))
+						transactionIndex = -1;
+
+					ImGui::End();
+				}
+			}
 
 			fileDialog.Display();
 
@@ -99,14 +190,18 @@ namespace OverlayHook
 					std::string script((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 					executor.scriptQueue.push(script);
 					logs->println("Queued script from file: %s", fileDialog.GetSelected().string().c_str());
+					Notifications::AddNotification("Queued script from file: " + fileDialog.GetSelected().filename().string());
 				}
 				else
 				{
 					logs->println("Failed to open selected file: %s", fileDialog.GetSelected().string().c_str());
+					Notifications::AddNotification("Failed to open selected file.");
 				}
 				fileDialog.ClearSelected();
 			}
 		}
+
+		Notifications::RenderNotifications();
 
 		ImGui::EndFrame();
 		ImGui::Render();

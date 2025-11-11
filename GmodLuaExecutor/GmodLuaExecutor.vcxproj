@@ -144,7 +144,9 @@
   <ItemGroup>
     <ClInclude Include="cheat\cheat.hpp" />
     <ClInclude Include="cheat\createmovehook.hpp" />
+    <ClInclude Include="cheat\htmlpanel.hpp" />
     <ClInclude Include="cheat\luahook.hpp" />
+    <ClInclude Include="cheat\nethooks.hpp" />
     <ClInclude Include="detours\detours.h" />
     <ClInclude Include="detours\detver.h" />
     <ClInclude Include="globals.hpp" />
@@ -152,6 +154,7 @@
     <ClInclude Include="helpers\library.hpp" />
     <ClInclude Include="helpers\logger.hpp" />
     <ClInclude Include="helpers\memory.hpp" />
+    <ClInclude Include="helpers\notifications.hpp" />
     <ClInclude Include="helpers\simplehook.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -163,6 +166,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="immods\imfilebrowser.hpp" />
     <ClInclude Include="immods\TextEditor.h" />
+    <ClInclude Include="sdk\interface.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="detours\detours.lib" />

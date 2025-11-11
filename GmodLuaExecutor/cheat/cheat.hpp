@@ -7,6 +7,7 @@
 #include "overlayhook.hpp"
 #include "luahook.hpp"
 #include "createmovehook.hpp"
+#include "htmlpanel.hpp"
 
 namespace cheat
 {
@@ -51,6 +52,17 @@ namespace cheat
 			return;
 		}
 
+		if (!HtmlPanelHook::Initialize())
+		{
+			logs->println("Failed to initialize HtmlPanelHook.");
+			CreateMoveHook::Cleanup();
+			LuaHook::Cleanup();
+			OverlayHook::Cleanup();
+			delete logs;
+			FreeLibraryAndExitThread(hMod, 0);
+			return;
+		}
+
 		logs->println("Cheat InitialThread finished.");
 
 		while (!GetAsyncKeyState(VK_END))
@@ -59,6 +71,7 @@ namespace cheat
 		logs->println("Cheat unloading...");
 
 		// Your cleanup code here
+		HtmlPanelHook::Cleanup();
 		CreateMoveHook::Cleanup();
 		LuaHook::Cleanup();
 		OverlayHook::Cleanup();

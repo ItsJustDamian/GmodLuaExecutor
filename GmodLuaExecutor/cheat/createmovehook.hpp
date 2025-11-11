@@ -5,6 +5,7 @@
 #include "../globals.hpp"
 #include "../helpers/memory.hpp"
 #include "../helpers/simplehook.hpp"
+#include "nethooks.hpp"
 
 typedef bool(__thiscall* CreateMoveFn)(void*, float, void*);
 
@@ -24,6 +25,27 @@ namespace CreateMoveHook
 			executor.scriptQueue.pop();
 			executor.ExecuteScript(script.c_str());
 			logs->println("Executed queued script.");
+			Notifications::AddNotification("Executed queued script.");
+		}
+
+		static bool once = true;
+		if (once)
+		{
+			once = false;
+			NetHooks::init();
+		}
+
+		if(netHooksEnabled && !NetHooks::hooked)
+		{
+			NetHooks::hook();
+			logs->println("NetHooks enabled.");
+			Notifications::AddNotification("NetHooks enabled.");
+		}
+		else if(!netHooksEnabled && NetHooks::hooked)
+		{
+			NetHooks::unhook();
+			logs->println("NetHooks disabled.");
+			Notifications::AddNotification("NetHooks disabled.");
 		}
 
 		return original;

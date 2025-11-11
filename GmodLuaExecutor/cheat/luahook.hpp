@@ -5,7 +5,7 @@
 #include "../globals.hpp"
 #include "../helpers/simplehook.hpp"
 
-typedef void* (__thiscall* CreateLuaInterfaceFn)(void*, int, bool);
+typedef LuaInterface* (__thiscall* CreateLuaInterfaceFn)(void*, int, bool);
 
 namespace LuaHook
 {
@@ -19,6 +19,7 @@ namespace LuaHook
 
 		executor.luaInterface = realInterface;
 		logs->println("New lua interface was created, moving to globals: 0x%p", executor.luaInterface);
+		Notifications::AddNotification("Lua interface created.");
 
 		executor.runStringEx = reinterpret_cast<RunStringExFn>(get_vfunc(executor.luaInterface, 111));
 		if (executor.runStringEx)

@@ -4,6 +4,8 @@
 
 #include "helpers/logger.hpp"
 #include "helpers/library.hpp"
+#include "helpers/notifications.hpp"
+#include "sdk/interface.hpp"
 
 #define get_vfunc(base, index) static_cast<uintptr_t>((*reinterpret_cast<uintptr_t**>(base))[index])
 #define get_vmt(address, index, offset, T) *(T**)(((*(uintptr_t**)(address))[index] + offset) + 7 + *(DWORD*)(((*(uintptr_t**)(address))[index] + offset) + 3))
@@ -12,10 +14,11 @@ typedef bool(__thiscall* RunStringExFn)(void* state, const char* filename, const
 
 inline AsyncLogger* logs = nullptr;
 inline bool menuOpen = false;
+inline bool netHooksEnabled = false;
 
 struct Executor
 {
-	void* luaInterface = nullptr;
+	LuaInterface* luaInterface = nullptr;
 	RunStringExFn runStringEx = nullptr;
 	std::queue<std::string> scriptQueue;
 

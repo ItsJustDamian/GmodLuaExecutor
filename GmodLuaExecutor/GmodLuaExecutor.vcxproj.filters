@@ -107,6 +107,18 @@
     <ClInclude Include="immods\TextEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cheat\nethooks.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helpers\notifications.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\interface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cheat\htmlpanel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="detours\detours.lib" />
